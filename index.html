@@ -104,35 +104,10 @@
             const b = document.createElement("button");    
             b.className = "opt-btn";    
             b.innerHTML = `<span class="letter">${alphabet[i]}</span> ${o}`;    
-            b.onclick = () => { userAnswers.push(i); current++; if(current < 5) loadQ(); else showResults(); };    
-            container.appendChild(b);    
-        });    
-    }    
-    
-    function showResults() {    
-        document.getElementById("quiz-box").style.display = "none";    
-        document.getElementById("result-screen").style.display = "block";    
-        let score = 0;    
-        const container = document.getElementById("review-container");    
-        container.innerHTML = "";    
-        questions.forEach((q, i) => {    
-            const ok = userAnswers[i] === q.ans;    
-            if(ok) score++;    
-            container.innerHTML += `<div class="review-item ${ok?'correct':'wrong'}">    
-                <p><strong>ጥያቄ ${i+1}:</strong> ${q.q}</p>    
-                <p>ያንተ ምርጫ: ${alphabet[userAnswers[i]]}) ${q.opts[userAnswers[i]]} ${ok?'✔️':'❌'}</p>    
-                ${!ok ? `<p style="color:#f1c40f">ትክክለኛው መልስ: ${alphabet[q.ans]}) ${q.opts[q.ans]}</p>` : ''}    
-            </div>`;    
-        });    
-        document.getElementById("score-text").innerText = `ውጤት: ${score}/5`;    
-          
-        if(score === 5) {  
-            notifyTelegram(score);  
-            document.getElementById("action-area").innerHTML = `<button class="btn-action" onclick="goToShare()">ወደ ሽልማት ገጽ እለፍ ➡️</button>`;    
-        } else {  
+            b.onclick = () => { userAnswers.push(i); current++; if(current < 5) loadQ()} else {    
             document.getElementById("action-area").innerHTML = `<button class="btn-action" onclick="location.reload()">እንደገና ሞክር 🔄</button>`;    
-        }  
-    }    
+        }      
+    }        
   
     function goToShare() {   
         document.getElementById("result-screen").style.display="none";   
@@ -144,12 +119,16 @@
         let progress = (shareCount / 5) * 100;  
         document.getElementById("fill").style.width = progress + "%";  
         document.getElementById("counter-text").innerText = "የቀረ ሼር: " + (5 - shareCount);  
-        window.open("whatsapp://send?text=የሐዲስ ውድድር ተሳተፉ! https://abduluazizhussein-ctrl.github.io/black-site/", "_blank");  
+          
+        // ዋትስአፕ ሼር ሊንክ  
+        const shareMsg = encodeURIComponent("የእስልምና የሐዲስ ውድድር ተሳተፉና የ100 ብር ካርድ አሸንፉ! 🎁\nhttps://abduluazizhussein-ctrl.github.io/black-site/");  
+        window.open(`https://api.whatsapp.com/send?text=${shareMsg}`, "_blank");  
+  
         if(shareCount >= 5) {  
             document.getElementById("share-section").style.display = "none";  
             document.getElementById("prize-section").style.display = "block";  
         }  
     }  
-</script>    
-</body>    
-</html>
+</script>        
+</body>        
+</html>  
