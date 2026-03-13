@@ -150,5 +150,74 @@
             } else {
                 document.getElementById('progress-bar').style.width = '100%';
                 document.getElementById('next-level-percent').innerText = 'MAX';
+  // 3. Cloud Saving  
+        async function saveToCloud() {  
+            try {  
+                await setDoc(doc(db, "users", userId), {  
+                    ...state,  
+                    name: userName,  
+                    lastUpdated: Date.now()  
+                });  
+            } catch (e) {  
+                console.error("Save error:", e);  
+            }  
+        }  
   
+        // 4. Interaction  
+        document.getElementById('tap-btn').addEventListener('click', (e) => {  
+            if(state.energy > 0) {  
+                state.coins += 1;  
+                state.energy -= 1;  
+                tg.HapticFeedback.impactOccurred('light');  
+                showTapEffect(e.clientX, e.clientY);  
+                updateUI();  
+                saveToCloud();   
+            }  
+        });  
+  
+        function showTapEffect(x, y) {  
+            const div = document.createElement('div');  
+            div.className = 'tap-effect';  
+            div.style.left = x + 'px'; div.style.top = y + 'px';  
+            div.innerText = '+1';  
+            document.body.appendChild(div);  
+            setTimeout(() => div.remove(), 800);  
+        }  
+  
+        // 5. Loops  
+        setInterval(() => {  
+            state.coins += (10/60);   
+            if(state.energy < 100) state.energy += 1;  
+            updateUI();  
+        }, 1000);  
+  
+        setInterval(saveToCloud, 30000);  
+  
+        // 6. Tabs  
+        window.loadLeaderboard = async function() {  
+            openTab('leaderboard');  
+            const list = document.getElementById('leader-list');  
+            list.innerHTML = '<div class="text-center py-10 animate-pulse">Syncing...</div>';  
+            const q = query(collection(db, "users"), orderBy("coins", "desc"), limit(10));  
+            const snap = await getDocs(q);  
+            list.innerHTML = '';  
+            let r = 1;  
+            snap.forEach(d => {  
+                const data = d.data();  
+                const item = document.createElement('div');  
+                item.className = `flex justify-between p-4 rounded-2xl mb-2 ${d.id === userId ? 'bg-yellow-500/20' : 'bg-slate-800'}`;  
+                item.innerHTML = `<span>${r++}. ${data.name || 'User'}</span> <span>${Math.floor(data.coins)} 🦴</span>`;  
+                list.appendChild(item);  
+            });  
+        }  
+  
+        window.openTab = function(t) {  
+            document.getElementById('game-tab').classList.toggle('hidden', t !== 'game');  
+            document.getElementById('leaderboard-tab').classList.toggle('hidden', t !== 'leaderboard');  
+        }  
+  
+        loadGame();  
+    </script>  
+</body>  
+</html>
 
