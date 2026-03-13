@@ -1,152 +1,287 @@
-<!DOCTYPE html>  
-<html lang="am">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-    <title>Rich Dog Pro</title>  
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>  
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">  
-    <style>  
-        :root { --primary: #f1c40f; --bg: #0a0b10; --card: #1c1e26; --accent: #27ae60; }  
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }  
-          
-        /* Top Bar */  
-        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; z-index: 10; }  
-        .top-btn { background: var(--card); border: none; color: white; width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; }  
-        .deposit-btn { background: var(--accent); color: white; font-weight: bold; padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; border: none; cursor: pointer; font-size: 0.85rem; }  
-  
-        /* Main Game Area */  
-        .game-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 80px; width: 100%; }  
-        .balance-amount { font-size: 3.5rem; font-weight: 800; color: var(--primary); text-shadow: 0 0 20px rgba(241, 196, 15, 0.4); margin-bottom: 10px; }  
-          
-        #dog-character { width: 240px; height: 240px; border-radius: 50%; border: 6px solid var(--card); box-shadow: 0 0 50px rgba(241, 196, 15, 0.2); transition: transform 0.1s; }  
-        #dog-character:active { transform: scale(0.95); }  
-  
-        /* Withdraw Form */  
-        .airdrop-card { background: var(--card); padding: 25px; border-radius: 20px; border: 1px solid var(--primary); width: 85%; max-width: 320px; text-align: center; }  
-        .input-box { width: 90%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #000; color: white; margin-top: 15px; margin-bottom: 10px; font-size: 0.8rem; text-align: center; }  
-        .claim-btn { background: var(--primary); color: black; border: none; padding: 15px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; }  
-  
-        /* Bottom Nav */  
-        .bottom-nav { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--card); padding: 12px 0; border-radius: 25px 25px 0 0; position: fixed; bottom: 0; width: 100%; z-index: 100; border-top: 1px solid rgba(255,255,255,0.1); }  
-        .nav-link { background: none; border: none; color: #888; font-size: 0.65rem; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }  
-        .nav-link.active { color: var(--primary); }  
-        .nav-link i { font-size: 1.2rem; }  
-  
-        .hidden { display: none !important; }  
-    </style>  
-</head>  
-<body>  
-  
-    <div class="top-nav">  
-        <button class="top-btn" onclick="alert('Settings: Coming Soon!')"><i class="fas fa-cog"></i></button>  
-        <button class="deposit-btn" onclick="showDepositInfo()">  
-            <span>Deposit</span> <i class="fas fa-plus-circle"></i>  
-        </button>  
-    </div>  
-  
-    <div id="home-page" class="game-content">  
-        <div class="balance-amount">💰 <span id="balance">0</span></div>  
-        <img id="dog-character" src="https://raw.githubusercontent.com/abduluazizhussein-ctrl/black-site/main/dog.png" alt="Rich Dog">  
-        <p style="color: #666; margin-top: 15px; font-size: 0.9rem;">Rich Dog Community</p>  
-    </div>  
-  
-    <div id="airdrop-page" class="game-content hidden">  
-        <h2 style="color: var(--primary);">🚀 Withdraw TON</h2>  
-        <div class="airdrop-card">  
-            <i class="fas fa-wallet" style="font-size: 3rem; color: var(--primary); margin-bottom: 10px;"></i>  
-            <h3>Withdrawal</h3>  
-            <p style="color: #aaa; font-size: 0.8rem;">ዝቅተኛው የክፍያ መጠን 10,000 Coins (0.25 TON) ነው።</p>  
-              
-            <input type="text" id="wallet-address" class="input-box" placeholder="የእርስዎን TON Wallet አድራሻ እዚህ ያስገቡ">  
-              
-            <button class="claim-btn" onclick="handleWithdraw()">Submit Request</button>  
-        </div>  
-    </div>  
-  
-    <nav class="bottom-nav">  
-        <button class="nav-link active" id="nav-home" onclick="showTab('home')">  
-            <i class="fas fa-home"></i><span>Home</span>  
-        </button>  
-        <button class="nav-link" onclick="alert('Spin Wheel is coming soon!')">  
-            <i class="fas fa-sync-alt"></i><span>Spin</span>  
-        </button>  
-        <button class="nav-link" onclick="inviteFriends()">  
-            <i class="fas fa-user-plus"></i><span>Friends</span>  
-        </button>  
-        <button class="nav-link" onclick="window.open('https://t.me/AzizAfarBot')">  
-            <i class="fas fa-tasks"></i><span>Tasks</span>  
-        </button>  
-        <button class="nav-link" id="nav-airdrop" onclick="showTab('airdrop')">  
-            <i class="fas fa-parachute-box"></i><span>Withdraw</span>  
-        </button>  
-    </nav>  
-  
-    <script>  
-        let tele = window.Telegram?.WebApp;  
-        if(tele) { tele.expand(); tele.ready(); tele.headerColor = '#0a0b10'; }  
-  
-        let balance = localStorage.getItem('rich_balance') === null ? 500 : parseInt(localStorage.getItem('rich_balance'));  
-        const myWallet = "UQBWRpRKdXdcArWPpUZYYo-bVQXF8KVsfH_AJZ9vyz0deW6m";  
-  
-        function updateUI() {  
-            document.getElementById('balance').innerText = balance.toLocaleString();  
-            localStorage.setItem('rich_balance', balance);  
-        }  
-  
-        function showTab(tab) {  
-            document.getElementById('home-page').classList.add('hidden');  
-            document.getElementById('airdrop-page').classList.add('hidden');  
-            document.getElementById(tab + '-page').classList.remove('hidden');  
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));  
-            document.getElementById('nav-' + tab).classList.add('active');  
-        }  
-  
-        function showDepositInfo() {  
-            alert("ሳንቲም ለመግዛት 0.5 TON ወደዚህ አድራሻ ይላኩ:\n\n" + myWallet + "\n\nከላኩ በኋላ ለቦቱ ማረጋገጫ ይላኩ።");  
-        }  
-  
-        async function handleWithdraw() {  
-            const userWallet = document.getElementById('wallet-address').value;  
-            const minAmount = 10000;  
-  
-            if (balance < minAmount) {  
-                alert("ስህተት: ለማውጣት ቢያንስ 10,000 ሳንቲም ያስፈልግዎታል!");  
-                return;  
-            }  
-  
-            if (userWallet.length < 10) {  
-                alert("እባክዎ ትክክለኛ የ TON Wallet አድራሻ ያስገቡ!");  
-                return;  
-            }  
-  
-            const botToken = "8269565802:AAH80pcceZonFiX2B4gUiCC0mtb7osyZBqU";  
-            const chatId = "8105159131";  
-            const userName = tele.initDataUnsafe.user?.first_name || 'Guest';  
-              
-            const message = `🚀 *New Manual Withdraw Request!*\n\n👤 User: ${userName}\n💰 Coins: ${balance}\n💎 User Wallet: \`${userWallet}\`\n🆔 User ID: ${tele.initDataUnsafe.user?.id || 'N/A'}`;  
-  
-            try {  
-                const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`);  
-                if (response.ok) {  
-                    alert("ጥያቄዎ ተልኳል! በ 24 ሰዓት ውስጥ ይገመገማል።");  
-                    balance = 0; updateUI();  
-                    document.getElementById('wallet-address').value = "";  
-                } else {  
-                    alert("ጥያቄውን መላክ አልተቻለም። ቦቱን መጀመሪያ Start ማለታችሁን አረጋግጡ።");  
-                }  
-            } catch (e) {  
-                alert("Network Error!");  
-            }  
-        }  
-  
-        function inviteFriends() {  
-            const url = "https://t.me/Aziz_afarbot/richdog";  
-            tele.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=Join Rich Dog!`);  
-            balance += 200; updateUI();  
-        }  
-  
-        updateUI();  
-    </script>  
-</body>  
-                </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rich Dog V2</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+body{
+margin:0;
+background:#0b0c12;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+padding:15px;
+}
+
+.deposit{
+background:#27ae60;
+border:none;
+color:white;
+padding:10px 15px;
+border-radius:10px;
+}
+
+.balance{
+font-size:40px;
+color:#f1c40f;
+margin-top:10px;
+}
+
+.dog{
+width:220px;
+border-radius:50%;
+margin-top:20px;
+}
+
+.energy{
+width:200px;
+height:10px;
+background:#333;
+margin:auto;
+border-radius:10px;
+overflow:hidden;
+}
+
+.energy-bar{
+height:100%;
+width:100%;
+background:#27ae60;
+}
+
+.spin-btn{
+margin-top:20px;
+padding:12px 20px;
+background:#f1c40f;
+border:none;
+border-radius:10px;
+font-weight:bold;
+}
+
+.bottom{
+position:fixed;
+bottom:0;
+width:100%;
+background:#1a1c24;
+display:flex;
+justify-content:space-around;
+padding:12px 0;
+}
+
+.bottom button{
+background:none;
+border:none;
+color:white;
+font-size:14px;
+}
+
+.hidden{
+display:none;
+}
+
+.page{
+padding-bottom:80px;
+}
+
+input{
+width:80%;
+padding:10px;
+border-radius:10px;
+border:none;
+margin-top:10px;
+}
+
+.withdraw{
+margin-top:10px;
+padding:10px 20px;
+background:#f1c40f;
+border:none;
+border-radius:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="top">
+<button onclick="alert('Settings Soon')">⚙</button>
+<button class="deposit" onclick="deposit()">Deposit</button>
+</div>
+
+<div id="home" class="page">
+
+<div class="balance">
+💰 <span id="coins">500</span>
+</div>
+
+<img class="dog" id="dog" src="https://raw.githubusercontent.com/abduluazizhussein-ctrl/black-site/main/dog.png">
+
+<div class="energy">
+<div class="energy-bar" id="energyBar"></div>
+</div>
+
+<button class="spin-btn" onclick="spin()">🎡 Spin</button>
+
+</div>
+
+<div id="friends" class="page hidden">
+
+<h2>Invite Friends</h2>
+
+<p>Earn 200 coins per friend</p>
+
+<button onclick="invite()">Invite</button>
+
+</div>
+
+<div id="tasks" class="page hidden">
+
+<h2>Tasks</h2>
+
+<button onclick="window.open('https://t.me/AzizAfarBot')">
+Join Telegram
+</button>
+
+</div>
+
+<div id="withdraw" class="page hidden">
+
+<h2>Withdraw TON</h2>
+
+<p>Minimum 10000 coins</p>
+
+<input id="wallet" placeholder="TON wallet address">
+
+<br>
+
+<button class="withdraw" onclick="withdraw()">Submit</button>
+
+</div>
+
+<div class="bottom">
+
+<button onclick="tab('home')">🏠 Home</button>
+<button onclick="tab('friends')">👥 Friends</button>
+<button onclick="tab('tasks')">📋 Tasks</button>
+<button onclick="tab('withdraw')">💸 Withdraw</button>
+
+</div>
+
+<script>
+
+let tele = window.Telegram?.WebApp
+if(tele){tele.expand()}
+
+let coins = localStorage.getItem("coins")
+? parseInt(localStorage.getItem("coins"))
+: 500
+
+let energy = 100
+
+update()
+
+document.getElementById("dog").onclick = function(){
+
+if(energy<=0) return
+
+coins+=1
+energy-=1
+
+update()
+
+}
+
+function update(){
+
+document.getElementById("coins").innerText=coins
+
+localStorage.setItem("coins",coins)
+
+document.getElementById("energyBar").style.width=energy+"%"
+
+}
+
+setInterval(()=>{
+
+if(energy<100){
+
+energy+=2
+
+update()
+
+}
+
+},1000)
+
+function spin(){
+
+let reward=Math.floor(Math.random()*500)
+
+coins+=reward
+
+alert("You won "+reward+" coins!")
+
+update()
+
+}
+
+function invite(){
+
+let link="https://t.me/share/url?url=https://t.me/Aziz_afarbot/richdog"
+
+tele.openTelegramLink(link)
+
+coins+=200
+
+update()
+
+}
+
+function withdraw(){
+
+let wallet=document.getElementById("wallet").value
+
+if(coins<10000){
+
+alert("Minimum 10000 coins")
+
+return
+
+}
+
+alert("Withdraw request sent")
+
+coins=0
+
+update()
+
+}
+
+function deposit(){
+
+alert("Send TON to your wallet address")
+
+}
+
+function tab(id){
+
+document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"))
+
+document.getElementById(id).classList.remove("hidden")
+
+}
+
+</script>
+
+</body>
+</html>
