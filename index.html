@@ -1,217 +1,57 @@
+```<html>
 <!DOCTYPE html>    
 <html lang="am">    
 <head>    
     <meta name="google-site-verification" content="sZZLXX6TxICEOKuWXcsf_nre2TQuvSIWXSaJqIzqBCI" />    
-        
     <meta charset="UTF-8">    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
     <title>Black-Site Rich Dog Game</title>    
-        
     <script src="https://telegram.org/js/telegram-web-app.js"></script>    
-    
     <style>    
-        body {     
-            background: radial-gradient(circle, #1a2a3a, #000);     
-            color: white;     
-            text-align: center;     
-            font-family: 'Segoe UI', Tahoma, sans-serif;     
-            overflow-x: hidden;     
-            margin: 0;    
-            padding: 20px 0;    
-            display: flex;    
-            flex-direction: column;    
-            align-items: center;    
-            touch-action: none;    
-        }    
-    
-        #score-container {     
-            font-size: 3.5rem;     
-            color: #f1c40f;     
-            text-shadow: 0 0 15px #f39c12;     
-            font-weight: bold;    
-            margin-top: 10px;    
-        }    
-    
-        #energy-container {    
-            margin: 15px 0;    
-            font-size: 1.1rem;    
-        }    
-    
-        .energy-bar-bg {    
-            width: 280px;    
-            height: 15px;    
-            background: #333;    
-            border-radius: 10px;    
-            margin: 8px auto;    
-            border: 1px solid #f1c40f;    
-            overflow: hidden;    
-        }    
-    
-        #energy-fill {    
-            width: 100%;    
-            height: 100%;    
-            background: linear-gradient(to right, #f1c40f, #e67e22);    
-            transition: width 0.3s ease;    
-        }    
-    
-        #dog-character {     
-            width: 240px;     
-            cursor: pointer;     
-            transition: transform 0.1s;     
-            filter: drop-shadow(0 0 20px rgba(241, 196, 15, 0.4));    
-            user-select: none;    
-            -webkit-user-drag: none;    
-        }    
-    
+        body { background: radial-gradient(circle, #1a2a3a, #000); color: white; text-align: center; font-family: 'Segoe UI', Tahoma, sans-serif; overflow-x: hidden; margin: 0; padding: 20px 0; display: flex; flex-direction: column; align-items: center; touch-action: none; }    
+        #score-container { font-size: 3.5rem; color: #f1c40f; text-shadow: 0 0 15px #f39c12; font-weight: bold; margin-top: 10px; }    
+        #energy-container { margin: 15px 0; font-size: 1.1rem; }    
+        .energy-bar-bg { width: 280px; height: 15px; background: #333; border-radius: 10px; margin: 8px auto; border: 1px solid #f1c40f; overflow: hidden; }    
+        #energy-fill { width: 100%; height: 100%; background: linear-gradient(to right, #f1c40f, #e67e22); transition: width 0.3s ease; }    
+        #dog-character { width: 240px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px rgba(241, 196, 15, 0.4)); user-select: none; -webkit-user-drag: none; }    
         #dog-character:active { transform: scale(0.92); }    
-    
-        /* Leaderboard Style */    
-        .leaderboard-box {    
-            background: rgba(255, 255, 255, 0.05);    
-            border: 1px solid rgba(241, 196, 15, 0.3);    
-            border-radius: 15px;    
-            width: 90%;    
-            max-width: 360px;    
-            margin-top: 25px;    
-            padding: 15px;    
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);    
-        }    
-    
-        .leaderboard-title {    
-            font-size: 1.2rem;    
-            color: #f1c40f;    
-            margin-bottom: 10px;    
-            border-bottom: 1px solid rgba(241, 196, 15, 0.2);    
-            padding-bottom: 5px;    
-        }    
-    
-        .leader-item {    
-            display: flex;    
-            justify-content: space-between;    
-            padding: 12px 8px;    
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);    
-        }    
-    
+        .leaderboard-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(241, 196, 15, 0.3); border-radius: 15px; width: 90%; max-width: 360px; margin-top: 25px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }    
+        .leaderboard-title { font-size: 1.2rem; color: #f1c40f; margin-bottom: 10px; border-bottom: 1px solid rgba(241, 196, 15, 0.2); padding-bottom: 5px; }    
+        .leader-item { display: flex; justify-content: space-between; padding: 12px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }    
         .leader-item:last-child { border-bottom: none; }    
-    
-        .coin-animation {     
-            position: absolute;     
-            color: #f1c40f;     
-            font-size: 1.8rem;    
-            font-weight: bold;     
-            pointer-events: none;    
-            animation: floatUp 0.8s forwards;     
-        }    
-    
-        @keyframes floatUp {     
-            from { opacity: 1; transform: translateY(0); }     
-            to { opacity: 0; transform: translateY(-120px); }     
-        }    
-    
+        .coin-animation { position: absolute; color: #f1c40f; font-size: 1.8rem; font-weight: bold; pointer-events: none; animation: floatUp 0.8s forwards; }    
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-120px); } }    
         #msg { color: #f1c40f; margin-top: 10px; font-weight: bold; }    
     </style>    
 </head>    
 <body>    
-    
     <div id="msg">እንኳን መጣህ ተጫዋች!</div>    
     <div id="score-container">💰 <span id="balance">0</span></div>    
-        
-    <div id="energy-container">    
-        ⚡ ጉልበት: <span id="energy-text">100</span>/100    
-        <div class="energy-bar-bg">    
-            <div id="energy-fill"></div>    
-        </div>    
-    </div>    
-          
-    <div>    
-        <img id="dog-character" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Rich Dog">    
-    </div>    
-    
+    <div id="energy-container">⚡ ጉልበት: <span id="energy-text">100</span>/100<div class="energy-bar-bg"><div id="energy-fill"></div></div></div>    ]
+    <div><img id="dog-character" src="dog.png" alt="Rich Dog"></div>    
     <div class="leaderboard-box">    
         <div class="leaderboard-title">🏆 የደረጃ ሰንጠረዥ (Leaderboard)</div>    
-        <div class="leader-item">    
-            <span>1. King Sep</span>    
-            <span>294,912 💰</span>    
-        </div>    
-        <div class="leader-item">    
-            <span>2. አብዱላዚዝ (አንተ)</span>    
-            <span id="user-rank-score">0 💰</span>    
-        </div>    
-        <div class="leader-item">    
-            <span>3. Thomas RICH</span>    
-            <span>143,966 💰</span>    
-        </div>    
+        <div class="leader-item"><span>1. King Sep</span><span>294,912 💰</span></div>    
+        <div class="leader-item"><span>2. አብዱላዚዝ (አንተ)</span><span id="user-rank-score">0 💰</span></div>    
+        <div class="leader-item"><span>3. Thomas RICH</span><span>143,966 💰</span></div>    
     </div>    
-    
     <script>    
-        // ቴሌግራም ዳታ    
-        const tele = window.Telegram.WebApp;    
-        tele.expand(); // ጨዋታውን ሙሉ ስክሪን ማድረግ    
-            
-        if (tele.initDataUnsafe?.user) {    
-            document.getElementById('msg').innerText = "ሰላም " + tele.initDataUnsafe.user.first_name + "!";    
-        }    
-    
-        // ዳታዎችን መጫን    
+        let tele = window.Telegram ? window.Telegram.WebApp : null;
+        if (tele) { tele.expand(); tele.ready(); }
+        if (tele?.initDataUnsafe?.user) { document.getElementById('msg').innerText = "ሰላም " + tele.initDataUnsafe.user.first_name + "!"; }    
         let balance = parseInt(localStorage.getItem('rich_balance')) || 0;    
         let energy = parseInt(localStorage.getItem('rich_energy')) || 100;    
-    
         const balanceDisplay = document.getElementById('balance');    
         const userRankScore = document.getElementById('user-rank-score');    
         const energyDisplay = document.getElementById('energy-text');    
         const energyFill = document.getElementById('energy-fill');    
         const dog = document.getElementById('dog-character');    
-    
-        // UI ማደስ    
-        function updateUI() {    
-            balanceDisplay.innerText = balance.toLocaleString();    
-            userRankScore.innerText = balance.toLocaleString() + " 💰";    
-            energyDisplay.innerText = energy;    
-            energyFill.style.width = energy + "%";    
-            localStorage.setItem('rich_balance', balance);    
-            localStorage.setItem('rich_energy', energy);    
-        }    
-    
+        function updateUI() { balanceDisplay.innerText = balance.toLocaleString(); userRankScore.innerText = balance.toLocaleString() + " 💰"; energyDisplay.innerText = energy; energyFill.style.width = energy + "%"; localStorage.setItem('rich_balance', balance); localStorage.setItem('rich_energy', energy); }    
         updateUI();    
-    
-        // በየ 3 ሰከንዱ ጉልበት መሙላት    
-        setInterval(() => {    
-            if (energy < 100) {    
-                energy++;    
-                updateUI();    
-            }    
-        }, 3000);    
-    
-        // ክሊክ ሲደረግ    
-        dog.addEventListener('click', (e) => {    
-            if (energy > 0) {    
-                balance += 1;    
-                energy -= 1;    
-                updateUI();    
-                createCoin(e.clientX, e.clientY);    
-                    
-                // ስልኩ እንዲርገበገብ (Vibrate)    
-                if (tele.HapticFeedback) tele.HapticFeedback.impactOccurred('medium');    
-            }    
-        });    
-    
-        function createCoin(x, y) {    
-            const coin = document.createElement('div');    
-            coin.innerText = '+1';    
-            coin.className = 'coin-animation';    
-            coin.style.left = (x || window.innerWidth/2) + 'px';    
-            coin.style.top = (y || window.innerHeight/2) + 'px';    
-            document.body.appendChild(coin);    
-            setTimeout(() => coin.remove(), 800);    
-        }    
-    
-        // ለስልክ ንክኪ    
-        dog.addEventListener('touchstart', (e) => {    
-            e.preventDefault();    
-            const touch = e.touches[0];    
-            dog.click();    
-            createCoin(touch.clientX, touch.clientY);    
-        });    
+        setInterval(() => { if (energy < 100) { energy++; updateUI(); } }, 3000);    
+        dog.addEventListener('click', (e) => { if (energy > 0) { balance += 1; energy -= 1;] updateUI(); createCoin(e.clientX, e.clientY); if (tele?.HapticFeedback) tele.HapticFeedback.impactOccurred('medium'); } });    
+        function createCoin(x, y) { const coin = document.createElement('div'); coin.innerText = '+1'; coin.className = 'coin-animation'; coin.style.left = (x || window.innerWidth/2) + 'px'; coin.style.top = (y || window.innerHeight/2) + 'px'; document.body.appendChild(coin); setTimeout(() => coin.remove(), 800); }    
+        dog.addEventListener('touchstart', (e) => { e.preventDefault(); const touch = e.touches[0]; dog.click(); createCoin(touch.clientX, touch.clientY); });    
     </script>    
 </body>    
 </html>
