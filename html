@@ -1,1 +1,51 @@
-
+<!DOCTYPE html>  
+<html lang="am">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Black-Site Rich Dog Clone</title>  
+    <style>  
+        body { background: radial-gradient(circle, #2c3e50, #000); color: white; text-align: center; font-family: 'Arial', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: center; }  
+        #score-container { font-size: 3rem; margin-bottom: 20px; color: #f1c40f; text-shadow: 0 0 10px #f39c12; }  
+        #dog-character { width: 200px; cursor: pointer; transition: transform 0.1s; }  
+        #dog-character:active { transform: scale(0.9); }  
+        .coin-animation { position: absolute; color: #f1c40f; font-weight: bold; animation: floatUp 1s forwards; }  
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-100px); } }  
+    </style>  
+</head>  
+<body>  
+  
+    <div id="score-container">💰 <span id="balance">0</span></div>  
+      
+    <div>  
+        <img id="dog-character" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Rich Dog">  
+    </div>  
+  
+    <script>  
+        let balance = localStorage.getItem('rich_balance') || 0;  
+        const balanceDisplay = document.getElementById('balance');  
+        const dog = document.getElementById('dog-character');  
+  
+        balanceDisplay.innerText = balance;  
+  
+        dog.addEventListener('click', (e) => {  
+            balance++;  
+            balanceDisplay.innerText = balance;  
+            localStorage.setItem('rich_balance', balance); // ነጥቡን ስልኩ ላይ ያስቀምጣል  
+  
+            // የሳንቲም ምልክት አኒሜሽን  
+            createCoin(e.clientX, e.clientY);  
+        });  
+  
+        function createCoin(x, y) {  
+            const coin = document.createElement('div');  
+            coin.innerText = '+1';  
+            coin.className = 'coin-animation';  
+            coin.style.left = x + 'px';  
+            coin.style.top = y + 'px';  
+            document.body.appendChild(coin);  
+            setTimeout(() => coin.remove(), 1000);  
+        }  
+    </script>  
+</body>  
+</html>
