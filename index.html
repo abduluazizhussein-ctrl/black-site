@@ -1,1 +1,125 @@
-
+<!DOCTYPE html>    
+<html lang="am">    
+<head>    
+    <meta charset="UTF-8">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>Rich Dog: Tap & Earn</title>    
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>    
+    <style>    
+        body { background: radial-gradient(circle, #1a2a3a, #000); color: white; text-align: center; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; touch-action: none; overflow-x: hidden; }    
+        #score-container { font-size: 3.5rem; color: #f1c40f; font-weight: bold; text-shadow: 0 0 15px rgba(243, 156, 18, 0.6); margin-bottom: 10px; }    
+        #dog-character { width: 220px; height: 220px; filter: drop-shadow(0 0 20px #f1c40f); border-radius: 50%; object-fit: cover; border: 5px solid #f1c40f; margin: 15px 0; }    
+          
+        /* Spin Wheel ዲዛይን - ምስሉ እንዲታይ ተስተካክሏል */  
+        #wheel-container { position: relative; margin: 20px 0; }    
+        #wheel {   
+            width: 190px;   
+            height: 190px;   
+            background: url('https://img.freepik.com/free-vector/fortune-wheel-isolated-vector-illustration_1284-41951.jpg?t=st=1715424000~exp=1715427600~hmac=a4b1f4') no-repeat center;  
+            background-size: contain;   
+            border-radius: 50%;   
+            border: 5px solid #f1c40f;   
+            transition: transform 3s ease-out;   
+        }    
+        #wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 25px; height: 25px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; border: 1px solid white; }    
+          
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 95%; max-width: 400px; margin-top: 15px; }    
+        .game-btn { padding: 14px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 0.9rem; }    
+        .invite-btn { background: #0088cc; grid-column: span 1; }    
+        .spin-btn { background: #8e44ad; grid-column: span 2; margin-bottom: 5px; }    
+        .deposit-btn { background: #f39c12; grid-column: span 2; }  
+        .task-btn { background: #27ae60; grid-column: span 1; }    
+        .info-text { color: #aaa; font-size: 0.8rem; margin-top: 5px; }  
+        #ton-connect-btn { margin: 10px 0; }  
+    </style>    
+</head>    
+<body>    
+    <div id="score-container">💰 <span id="balance">0</span></div>    
+    <div class="info-text">Rich Dog Community</div>  
+  
+    <img id="dog-character" src="https://raw.githubusercontent.com/abduluazizhussein-ctrl/black-site/main/dog.png" alt="Rich Dog">    
+    
+    <div id="ton-connect-btn"></div>    
+    
+    <div id="wheel-container">    
+        <div id="wheel-pointer"></div>    
+        <div id="wheel"></div>    
+    </div>    
+    
+    <div class="btn-grid">    
+        <button class="game-btn spin-btn" onclick="spinWheel()">🎡 ዕድልዎን ይሞክሩ (Max 50 💰)</button>    
+        <button class="game-btn invite-btn" onclick="inviteFriends()">👥 ጓደኞችን ጋብዝ (+200)</button>    
+        <button class="game-btn task-btn" onclick="completeTask()">📢 Join @AzizAfarBot</button>    
+        <button class="game-btn deposit-btn" onclick="buyCoins()">💎 5,000 Coins ግዛ (0.5 TON)</button>  
+    </div>    
+    
+    <script>    
+        let tele = window.Telegram?.WebApp;    
+        if(tele) { tele.expand(); tele.ready(); }    
+  
+        let balance = localStorage.getItem('rich_balance') === null ? 500 : parseInt(localStorage.getItem('rich_balance'));    
+    
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({    
+            manifestUrl: 'https://abduluazizhussein-ctrl.github.io/black-site/tonconnect-manifest.json',    
+            buttonRootId: 'ton-connect-btn'    
+        });    
+    
+        function updateUI() {    
+            document.getElementById('balance').innerText = balance.toLocaleString();    
+            localStorage.setItem('rich_balance', balance);    
+        }    
+    
+        function spinWheel() {    
+            const wheel = document.getElementById('wheel');    
+            let randomDeg = Math.floor(Math.random() * 360) + 1800;     
+            wheel.style.transform = `rotate(${randomDeg}deg)`;    
+                
+            setTimeout(() => {    
+                const winPrizes = [5, 10, 20, 30, 50];  
+                const win = winPrizes[Math.floor(Math.random() * winPrizes.length)];    
+                balance += win; updateUI();    
+                alert(`እንኳን ደስ አለዎት! ${win} 💰 አሸነፉ!`);    
+                wheel.style.transition = "none";    
+                wheel.style.transform = "rotate(0deg)";    
+                setTimeout(() => wheel.style.transition = "transform 3s ease-out", 100);    
+            }, 3500);    
+        }    
+    
+        async function buyCoins() {  
+            if (!tonConnectUI.connected) {  
+                alert("እባክዎ መጀመሪያ ዋሌትዎን ያገናኙ!");  
+                return;  
+            }  
+            const transaction = {  
+                validUntil: Math.floor(Date.now() / 1000) + 60,  
+                messages: [{  
+                    address: "TGxSZwwKVmhMzaC6x5MxpUQss84XnjdXdR",   
+                    amount: "500000000",   
+                }]  
+            };  
+            try {  
+                const result = await tonConnectUI.sendTransaction(transaction);  
+                if (result) {  
+                    balance += 5000; updateUI();  
+                    alert("ግዢው ተሳክቷል! 5,000 💰 ተጨምሯል።");  
+                }  
+            } catch (e) { alert("ክፍያው አልተሳካም!"); }  
+        }  
+  
+        function inviteFriends() {    
+            const url = "https://t.me/Aziz_afarbot/richdog";    
+            const text = "Rich Dog ተጫወትና ሳንቲም ሰብስብ! 💰";    
+            tele.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);    
+            balance += 200; updateUI();  
+        }    
+    
+        function completeTask() {    
+            window.open("https://t.me/AzizAfarBot", "_blank");    
+            balance += 100; updateUI();    
+        }    
+    
+        updateUI();    
+    </script>    
+</body>    
+</html>
