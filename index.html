@@ -1,175 +1,172 @@
 <!DOCTYPE html>    
 <html lang="am">    
 <head>    
+    <meta name="google-site-verification" content="sZZLXX6TxICEOKuWXcsf_nre2TQuvSIWxSaJqIzqBCI" />    
+        
     <meta charset="UTF-8">    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <title>የሐዲስ ውድድር - በአብዱላዚዝ</title>  <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid #00ffcc;">    
-    <h3 style="color: #00ffcc; margin-bottom: 15px;">ምን መጫወት ይፈልጋሉ?</h3>    
+    <title>Black-Site Rich Dog Game</title>    
         
-    <a href="quiz.html" class="btn-action" style="background: #f1c40f; color: black; padding: 12px 20px; border-radius: 50px; text-decoration: none; display: block; margin-bottom: 10px; font-weight: bold;">🏆 የሐዲስ ውድድር</a>    
-        
-    <a href="word-game.html" class="btn-action" style="background: #00ffcc; color: black; padding: 12px 20px; border-radius: 50px; text-decoration: none; display: block; font-weight: bold;">🧩 የቃላት ጨዋታ (Word Puzzle)</a>    
-    </div>  
     <style>    
-        body { margin: 0; background: #0b1120; color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }    
-        .quiz-container { width: 95%; max-width: 500px; background: rgba(30, 41, 59, 0.95); padding: 30px; border-radius: 25px; border: 2px solid #f1c40f; box-shadow: 0 0 40px rgba(0,0,0,0.5); }    
-        #welcome-box { display: block; }    
-        .islamic-icon { font-size: 50px; margin-bottom: 10px; color: #f1c40f; }    
-        .prize-badge { background: #f1c40f; color: black; font-weight: bold; padding: 10px 25px; border-radius: 50px; display: inline-block; margin-bottom: 20px; font-size: 22px; }    
-        h1 { color: #f1c40f; margin-bottom: 15px; font-size: 24px; }    
-        .intro-text { font-size: 17px; line-height: 1.6; color: #cbd5e1; margin-bottom: 25px; }    
-        .question { font-size: 19px; margin-bottom: 25px; line-height: 1.5; }    
-        .options { display: grid; gap: 12px; }    
-        .opt-btn { padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid #334155; color: white; border-radius: 12px; cursor: pointer; transition: 0.3s; font-size: 16px; text-align: left; display: flex; align-items: center; }    
-        .opt-btn:hover { background: rgba(241, 196, 15, 0.2); border-color: #f1c40f; }    
-        .letter { background: #f1c40f; color: black; font-weight: bold; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-right: 15px; }    
-        #quiz-box, #result-screen, #share-section, #prize-section { display: none; }    
-        .btn-action { background: #f1c40f; color: black !important; font-weight: bold; padding: 16px 35px; border-radius: 50px; text-decoration: none; display: inline-block; margin-top: 10px; border: none; cursor: pointer; font-size: 18px; }    
-        .progress-bar { width: 100%; height: 15px; background: #1e293b; border-radius: 50px; margin: 20px 0; overflow: hidden; }    
-        .progress-fill { width: 0%; height: 100%; background: #00ffcc; transition: 0.5s; }    
-        .review-item { text-align: left; background: rgba(0,0,0,0.3); padding: 15px; margin-bottom: 10px; border-radius: 10px; border-left: 5px solid transparent; }    
-        .correct { border-left-color: #25d366; color: #25d366; }    
-        .wrong { border-left-color: #ff4d4d; color: #ff4d4d; }    
+        body {     
+            background: radial-gradient(circle, #2c3e50, #000);     
+            color: white;     
+            text-align: center;     
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;     
+            overflow: hidden;     
+            height: 100vh;     
+            display: flex;     
+            flex-direction: column;     
+            justify-content: center;     
+            margin: 0;    
+        }    
+    
+        #score-container {     
+            font-size: 3.5rem;     
+            margin-bottom: 10px;     
+            color: #f1c40f;     
+            text-shadow: 0 0 15px #f39c12;     
+            font-weight: bold;    
+        }    
+    
+        #energy-container {    
+            margin-bottom: 20px;    
+            font-size: 1.2rem;    
+        }    
+    
+        .energy-bar-bg {    
+            width: 250px;    
+            height: 20px;    
+            background: #444;    
+            border-radius: 10px;    
+            margin: 10px auto;    
+            border: 2px solid #f1c40f;    
+        }    
+    
+        #energy-fill {    
+            width: 100%;    
+            height: 100%;    
+            background: linear-gradient(to right, #f1c40f, #e67e22);    
+            border-radius: 8px;    
+            transition: width 0.2s;    
+        }    
+    
+        #dog-character {     
+            width: 220px;     
+            cursor: pointer;     
+            transition: transform 0.1s;     
+            user-select: none;    
+            -webkit-user-drag: none;    
+        }    
+    
+        #dog-character:active {     
+            transform: scale(0.92);     
+        }    
+    
+        .coin-animation {     
+            position: absolute;     
+            color: #f1c40f;     
+            font-size: 1.5rem;    
+            font-weight: bold;     
+            pointer-events: none;    
+            animation: floatUp 0.8s forwards;     
+        }    
+    
+        @keyframes floatUp {     
+            from { opacity: 1; transform: translateY(0); }     
+            to { opacity: 0; transform: translateY(-120px); }     
+        }    
+    
+        .status-msg {    
+            color: #e74c3c;    
+            font-weight: bold;    
+            height: 20px;    
+            margin-top: 10px;    
+        }    
     </style>    
 </head>    
 <body>    
     
-<div class="quiz-container">    
-    <div id="welcome-box">    
-        <div class="islamic-icon">🌙</div>    
-        <h1>የእስልምና የሐዲስ ውድድር</h1>    
-        <div class="prize-badge">ሽልማት: 100 ብር ካርድ 🎁</div>    
-        <p class="intro-text">5ቱንም ጥያቄዎች በትክክል በመመለስ የሞባይል ካርድ አሸንፉ!</p>    
-        <button class="btn-action" onclick="startQuiz()">ውድድሩን ጀምር 🚀</button>    
+    <div id="score-container">💰 <span id="balance">0</span></div>    
+        
+    <div id="energy-container">    
+        ⚡ ጉልበት: <span id="energy-text">100</span>/100    
+        <div class="energy-bar-bg">    
+            <div id="energy-fill"></div>    
+        </div>    
     </div>    
-    
-    <div id="quiz-box">    
-        <h1 id="q-header">ጥያቄ 1/5</h1>    
-        <p class="question" id="q-text"></p>    
-        <div class="options" id="opt-container"></div>    
-    </div>    
-    
-    <div id="result-screen">    
-        <h1 id="score-text">ውጤት: 0/5</h1>    
-        <div id="review-container" style="max-height: 350px; overflow-y: auto; margin-bottom: 15px;"></div>    
-        <div id="action-area"></div>    
-    </div>    
-    
-    <div id="share-section">    
-        <h1 style="color: #00ffcc;">🎊 ድንቅ ነው!</h1>    
-        <p>ሽልማቱን ለመቀበል ለ 5 ጓደኞችህ ሼር አድርግ።</p>    
-        <div class="progress-bar"><div id="fill" class="progress-fill"></div></div>    
-        <p id="counter-text" style="color: #f1c40f;">የቀረ ሼር: 5</p>    
-        <button class="btn-action" onclick="handleShare()" style="background:#25d366; color:white !important;">ሼር አድርግ 🚀</button>    
-    </div>    
-    
-    <div id="prize-section">    
-        <h1 style="color: #f1c40f;">🎁 እንኳን ደስ አለህ!</h1>    
-        <div style="background: rgba(255, 77, 77, 0.2); border: 2px dashed #ff4d4d; padding: 15px; border-radius: 15px; margin: 20px 0;">      
-            <p style="font-size: 18px; color: white;">ሽልማቱን ለመቀበል ውጤትህን <b>Screenshot</b> አድርገህ ላክልኝ።</p>      
-        </div>      
-        <a href="https://t.me/Aziz_afar" class="btn-action">ሽልማቴን ላክልኝ 💳</a>        
-    </div>    
-</div>    
-    
-<script>    
-    const alphabet = ["A", "B", "C", "D"];    
-    const questions = [    
-        { q: "ከነቢዩ (ሰ.ዐ.ወ) ብዙ ሐዲሶችን በመዘገብ ቀዳሚ የሆኑት ሶሃባ ማን ናቸው?", opts: ["አሊ ኢብኑ አቢ ጣሊብ", "አቡ ሁረይራ (ረ.ዐ)", "አነስ ኢብኑ ማሊክ", "ዑስማን ኢብኑ ዓፋን"], ans: 1 },    
-        { q: "'ሥራዎች ሁሉ የሚመዘኑት በሐሳብ ነው' የሚለው ሐዲስ የት ይገኛል?", opts: ["ሳሂህ ቡኻሪ", "ሪያዱ አስ-ሷሊሒን", "ቡሉጉል መራም", "ሙወጣእ ማሊክ"], ans: 0 },    
-        { q: "ነቢዩ (ሰ.ዐ.ወ) 'ከእናንተ መካከል በላጩ...' ብለው የገለጹት ማንን ነው?", opts: ["ብዙ ሶደቃ የሰጠ", "ቁርኣንን ተምሮ ያስተማረ", "በጣም የሰገደ", "የተዋጋ"], ans: 1 },    
-        { q: "'ሷሂሃይን' በመባል የሚታወቁት የትኞቹ ናቸው?", opts: ["ቲርሚዚና አቡ ዳውድ", "ቡኻሪ እና ሙስሊም", "ኢብኑ ማጃህና ነሳኢ", "ሙስነድ አህመድ"], ans: 1 },    
-        { q: "አንድ ሐዲስ 'ሶሂህ' ለመባል ስንት መስፈርቶችን ማሟላት አለበት?", opts: ["3", "4", "5", "7"], ans: 2 }    
-    ];    
-    
-    let current = 0;    
-    let userAnswers = [];    
-    let shareCount = 0;    
-  
-    // ቦቱ ለአንተ መልእክት የሚልክበት ክፍል  
-    function notifyTelegram(score) {      
-        const token = "8269565802:AAH80pcceZonFiX2B4gUiCC0mtb7osyZBqU";      
-        const chatId = "8105159131"; // ያንተ አዲሱ Chat ID  
-        const msg = `🚀 አብዱላዚዝ አዲስ አሸናፊ!\n\nአንድ ተጠቃሚ ሁሉንም ጥያቄዎች በትክክል መለሰ።\nውጤት: ${score}/5`;      
           
-        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`)  
-        .then(response => console.log("Telegram Notified"))  
-        .catch(error => console.error("Error:", error));  
-    }  
-  
-    function startQuiz() {    
-        document.getElementById("welcome-box").style.display = "none";    
-        document.getElementById("quiz-box").style.display = "block";    
-        loadQ();    
-    }    
+    <div>    
+        <img id="dog-character" src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Rich Dog">    
+    </div>    
     
-    function loadQ() {    
-        const q = questions[current];    
-        document.getElementById("q-header").innerText = `ጥያቄ ${current + 1}/5`;    
-        document.getElementById("q-text").innerText = q.q;    
-        const container = document.getElementById("opt-container");    
-        container.innerHTML = "";    
-        q.opts.forEach((o, i) => {    
-            const b = document.createElement("button");    
-            b.className = "opt-btn";    
-            b.innerHTML = `<span class="letter">${alphabet[i]}</span> ${o}`;    
-            b.onclick = () => { selectAnswer(i); };    
-            container.appendChild(b);    
+    <div id="msg" class="status-msg"></div>    
+    
+    <script>    
+        // ዳታዎችን ከስልኩ ሜሞሪ መጫን    
+        let balance = parseInt(localStorage.getItem('rich_balance')) || 0;    
+        let energy = parseInt(localStorage.getItem('rich_energy')) || 100;    
+    
+        const balanceDisplay = document.getElementById('balance');    
+        const energyDisplay = document.getElementById('energy-text');    
+        const energyFill = document.getElementById('energy-fill');    
+        const dog = document.getElementById('dog-character');    
+        const msg = document.getElementById('msg');    
+    
+        // መጀመሪያ ላይ ያሉትን ነጥቦች ማሳየት    
+        balanceDisplay.innerText = balance;    
+        updateEnergyUI();    
+    
+        // በየ 3 ሰከንዱ ጉልበት እንዲሞላ (Auto-regen)    
+        setInterval(() => {    
+            if (energy < 100) {    
+                energy++;    
+                updateEnergyUI();    
+                saveData();    
+            }    
+        }, 3000);    
+    
+        // ውሻው ሲነካ የሚሰራው ስራ    
+        dog.addEventListener('click', (e) => {    
+            if (energy > 0) {    
+                balance++;    
+                energy--;    
+                    
+                balanceDisplay.innerText = balance;    
+                updateEnergyUI();    
+                saveData();    
+                createCoin(e.clientX, e.clientY);    
+                msg.innerText = ""; // መልዕክቱን ማጥፋት    
+            } else {    
+                msg.innerText = "ጉልበት አልቆብሃል! ትንሽ ጠብቅ...";    
+            }    
         });    
-    }    
-  
-    function selectAnswer(i) {  
-        userAnswers.push(i);   
-        current++;   
-        if(current < 5) loadQ();   
-        else showResults();  
-    }  
     
-    function showResults() {    
-        document.getElementById("quiz-box").style.display = "none";    
-        document.getElementById("result-screen").style.display = "block";    
-        let score = 0;    
-        const container = document.getElementById("review-container");    
-        container.innerHTML = "";    
-        questions.forEach((q, i) => {    
-            const ok = userAnswers[i] === q.ans;    
-            if(ok) score++;    
-            container.innerHTML += `<div class="review-item ${ok?'correct':'wrong'}">    
-                <p><strong>ጥያቄ ${i+1}:</strong> ${q.q}</p>    
-                <p>ያንተ ምርጫ: ${alphabet[userAnswers[i]]}) ${q.opts[userAnswers[i]]} ${ok?'✔️':'❌'}</p>    
-                ${!ok ? `<p style="color:#f1c40f">ትክክለኛው መልስ: ${alphabet[q.ans]}) ${q.opts[q.ans]}</p>` : ''}    
-            </div>`;    
+        function updateEnergyUI() {    
+            energyDisplay.innerText = energy;    
+            energyFill.style.width = energy + "%";    
+        }    
+    
+        function saveData() {    
+            localStorage.setItem('rich_balance', balance);    
+            localStorage.setItem('rich_energy', energy);    
+        }    
+    
+        function createCoin(x, y) {    
+            const coin = document.createElement('div');    
+            coin.innerText = '+1';    
+            coin.className = 'coin-animation';    
+            coin.style.left = x + 'px';    
+            coin.style.top = y + 'px';    
+            document.body.appendChild(coin);    
+            setTimeout(() => coin.remove(), 800);    
+        }    
+    
+        // ለስልክ ንክኪ (Touch) እንዲመች    
+        dog.addEventListener('touchstart', (e) => {    
+            e.preventDefault(); // ገጹ እንዳይንቀሳቀስ    
+            dog.click();    
         });    
-        document.getElementById("score-text").innerText = `ውጤት: ${score}/5`;    
-          
-        const area = document.getElementById("action-area");  
-        if(score === 5) {  
-            notifyTelegram(score); // 5/5 ሲመጣ መልእክት ይልካል  
-            area.innerHTML = `<button class="btn-action" onclick="goToShare()">ወደ ሽልማት ገጽ እለፍ ➡️</button>`;    
-        } else {  
-            area.innerHTML = `<button class="btn-action" onclick="location.reload()">እንደገና ሞክር 🔄</button>`;    
-        }  
-    }    
-  
-    function goToShare() {   
-        document.getElementById("result-screen").style.display="none";   
-        document.getElementById("share-section").style.display="block";   
-    }  
-  
-    function handleShare() {  
-        shareCount++;  
-        let progress = (shareCount / 5) * 100;  
-        document.getElementById("fill").style.width = progress + "%";  
-        document.getElementById("counter-text").innerText = "የቀረ ሼር: " + (5 - shareCount);  
-          
-        const shareMsg = encodeURIComponent("የእስልምና የሐዲስ ውድድር ተሳተፉና የ100 ብር ካርድ አሸንፉ! 🎁\nhttps://abduluazizhussein-ctrl.github.io/black-site/");  
-        window.open(`https://api.whatsapp.com/send?text=${shareMsg}`, "_blank");  
-  
-        if(shareCount >= 5) {  
-            document.getElementById("share-section").style.display = "none";  
-            document.getElementById("prize-section").style.display = "block";  
-        }  
-    }  
-</script>    
+    </script>    
 </body>    
-  </html>
+</html>
