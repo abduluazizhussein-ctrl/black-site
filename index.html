@@ -1,1 +1,239 @@
+``</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rich Dog V3 - Cloud Edition</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { user-select: none; -webkit-tap-highlight-color: transparent; background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .progress-fill { transition: width 0.4s ease-out; }
+        .tap-effect { position: absolute; pointer-events: none; animation: flyUp 0.8s ease-out forwards; font-weight: bold; color: #fbbf24; z-index: 100; }
+        @keyframes flyUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        .dog-btn:active { transform: scale(0.92); }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
 
+    <div id="loading" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center">
+        <div class="animate-bounce text-6xl mb-4">🐕</div>
+        <p class="text-yellow-500 font-bold">Loading Data...</p>
+    </div>
+
+    <div class="p-4 flex justify-between items-center bg-slate-800/50 backdrop-blur-md border-b border-slate-700">
+        <div class="flex items-center gap-2">
+            <div id="user-photo" class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center font-bold text-xl">🐕</div>
+            <div>
+                <p id="user-name" class="text-sm font-medium">Player</p>
+                <p id="rank-display" class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider italic">Puppy Rank</p>
+            </div>
+        </div>
+        <div class="bg-slate-700 px-3 py-1 rounded-full text-xs font-bold border border-slate-600">
+            <span class="text-blue-400">⚡</span> <span id="energy-count">100</span>
+        </div>
+    </div>
+
+    <main id="game-tab" class="flex-1 flex flex-col items-center justify-center p-6 space-y-6">
+        <div class="text-center">
+            <h1 id="coin-balance" class="text-5xl font-black flex items-center justify-center gap-2 tracking-tight">
+                0 <span class="text-yellow-500 text-3xl">🦴</span>
+            </h1>
+            <p class="text-slate-400 mt-1 text-xs uppercase tracking-widest font-semibold">Auto-Mining: +10/min</p>
+        </div>
+
+        <div class="w-full max-w-xs">
+            <div class="flex justify-between text-[10px] mb-1 font-bold uppercase text-slate-400">
+                <span id="current-level-name">Level 1</span>
+                <span id="next-level-percent">0%</span>
+            </div>
+            <div class="w-full h-4 bg-slate-800 rounded-full border border-slate-700 p-0.5 shadow-inner">
+                <div id="progress-bar" class="progress-fill h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.4)]" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <button id="tap-btn" class="dog-btn w-64 h-64 bg-slate-800 rounded-full border-[10px] border-slate-700 shadow-[0_0_60px_rgba(0,0,0,0.6)] flex items-center justify-center text-8xl transition-all active:border-yellow-600 outline-none">
+            🐕
+        </button>
+    </main>
+
+    <div id="leaderboard-tab" class="hidden flex-1 p-6 overflow-y-auto">
+        <h2 class="text-2xl font-black mb-6 flex items-center gap-2"><i class="fas fa-crown text-yellow-500"></i> Global Top</h2>
+        <div id="leader-list" class="space-y-3 pb-20">
+            </div>
+    </div>
+
+    <nav class="bg-slate-900 border-t border-slate-800 p-3 flex justify-around items-center">
+        <button onclick="openTab('game')" class="flex flex-col items-center gap-1 text-yellow-500 transition-colors">
+            <i class="fas fa-paw text-xl"></i><span class="text-[10px] font-bold">GAME</span>
+        </button>
+        <button onclick="loadLeaderboard()" class="flex flex-col items-center gap-1 text-slate-500 hover:text-yellow-400 transition-colors">
+            <i class="fas fa-trophy text-xl"></i><span class="text-[10px] font-bold">TOP</span>
+        </button>
+        <button onclick="inviteFriend()" class="flex flex-col items-center gap-1 text-slate-500 hover:text-yellow-400 transition-colors">
+            <i class="fas fa-user-plus text-xl"></i><span class="text-[10px] font-bold">INVITE</span>
+        </button>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPSJoIUF_xfrRqjiLQmEn_IG4rGnN8ZtA",
+            authDomain: "rich-dog-game.firebaseapp.com",
+            projectId: "rich-dog-game",
+            storageBucket: "rich-dog-game.firebasestorage.app",
+            messagingSenderId: "899688128690",
+            appId: "1:899688128690:web:2ad8761e986d7ba226a9ab"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let state = { coins: 0, energy: 100, lastUpdated: Date.now() };
+        const userId = tg.initDataUnsafe?.user?.id?.toString() || "guest_" + Math.floor(Math.random() * 1000);
+        const userName = tg.initDataUnsafe?.user?.first_name || "Guest";
+
+        const LEVELS = [
+            { name: "Puppy", threshold: 0 },
+            { name: "Good Boy", threshold: 1000 },
+            { name: "Rich Dog", threshold: 5000 },
+            { name: "Alpha Leader", threshold: 25000 },
+            { name: "Legendary Dog", threshold: 100000 }
+        ];
+
+        // 1. Initial Load
+        async function loadGame() {
+            try {
+                const docSnap = await getDoc(doc(db, "users", userId));
+                if (docSnap.exists()) {
+                    state = docSnap.data();
+                } else {
+                    await saveToCloud(); // First time user
+                }
+                document.getElementById('user-name').innerText = userName;
+                document.getElementById('loading').classList.add('hidden');
+                updateUI();
+            } catch (e) {
+                console.error("Error loading:", e);
+                document.getElementById('loading').innerText = "Database Error! Check Firebase Rules.";
+            }
+        }
+
+        // 2. UI Updates
+        window.updateUI = function() {
+            document.getElementById('coin-balance').innerHTML = `${Math.floor(state.coins)} <span class="text-yellow-500 text-3xl">🦴</span>`;
+            document.getElementById('energy-count').innerText = state.energy;
+            
+            let lvlIdx = 0;
+            for(let i = LEVELS.length-1; i >=0; i--) {
+                if(state.coins >= LEVELS[i].threshold) { lvlIdx = i; break; }
+            }
+
+            const current = LEVELS[lvlIdx];
+            const next = LEVELS[lvlIdx + 1];
+            
+            document.getElementById('current-level-name').innerText = current.name;
+            document.getElementById('rank-display').innerText = current.name + " Rank";
+
+            if(next) {
+                let range = next.threshold - current.threshold;
+                let progress = ((state.coins - current.threshold) / range) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('next-level-percent').innerText = `${Math.floor(progress)}%`;
+            } else {
+                document.getElementById('progress-bar').style.width = '100%';
+                document.getElementById('next-level-percent').innerText = 'MAX';
+            }
+        }
+
+        // 3. Cloud Saving
+        async function saveToCloud() {
+            await setDoc(doc(db, "users", userId), {
+                ...state,
+                name: userName,
+                lastUpdated: Date.now()
+            });
+        }
+
+        // 4. Interaction
+        document.getElementById('tap-btn').addEventListener('click', (e) => {
+            if(state.energy > 0) {
+                state.coins += 1;
+                state.energy -= 1;
+                tg.HapticFeedback.impactOccurred('light');
+                showTapEffect(e.clientX, e.clientY);
+                updateUI();
+                saveToCloud(); // Immediate save on tap
+            } else {
+                tg.HapticFeedback.notificationOccurred('error');
+            }
+        });
+
+        function showTapEffect(x, y) {
+            const div = document.createElement('div');
+            div.className = 'tap-effect';
+            div.style.left = x + 'px'; div.style.top = y + 'px';
+            div.innerText = '+1';
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 800);
+        }
+
+        // 5. Background Loops (Mining & Energy)
+        setInterval(() => {
+            state.coins += (10/60); // 10 per minute
+            if(state.energy < 100) state.energy += 1;
+            updateUI();
+            if(Math.random() > 0.8) saveToCloud(); // Save occasionally to cloud
+        }, 1000);
+
+        // 6. Tabs & Features
+        window.loadLeaderboard = async function() {
+            openTab('leaderboard');
+            const list = document.getElementById('leader-list');
+            list.innerHTML = '<div class="text-center py-10 animate-pulse text-slate-500">Syncing Cloud...</div>';
+            
+            try {
+                const q = query(collection(db, "users"), orderBy("coins", "desc"), limit(10));
+                const snap = await getDocs(q);
+                list.innerHTML = '';
+                let r = 1;
+                snap.forEach(d => {
+                    const data = d.data();
+                    const item = document.createElement('div');
+                    item.className = `flex justify-between items-center p-4 rounded-2xl ${d.id === userId ? 'bg-yellow-500/10 border border-yellow-500/50' : 'bg-slate-800/50 border border-slate-700'}`;
+                    item.innerHTML = `
+                        <div class="flex items-center gap-4">
+                            <span class="text-slate-500 font-bold w-4">${r++}.</span>
+                            <span class="font-semibold text-slate-200">${data.name || 'Anonymous'}</span>
+                        </div>
+                        <span class="font-black text-yellow-500">${Math.floor(data.coins)} 🦴</span>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch (e) {
+                list.innerHTML = `<div class="text-red-400 text-center text-xs">Rule Error: Set Firestore to Test Mode</div>`;
+            }
+        }
+
+        window.openTab = function(tabName) {
+            document.getElementById('game-tab').classList.add('hidden');
+            document.getElementById('leaderboard-tab').classList.add('hidden');
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+        }
+
+        window.inviteFriend = function() {
+            const link = `https://t.me/your_bot_name?start=${userId}`;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join me on Rich Dog! Earn 🦴 and climb the leaderboard!`);
+        }
+
+        loadGame();
+    </script>
+</body>
+</html>
