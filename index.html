@@ -1,1 +1,59 @@
-
+<!DOCTYPE html>          
+<html lang="am">          
+<head>          
+    <meta charset="UTF-8">          
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">          
+    <title>Rich Dog: Tap & Earn</title>          
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>  
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>          
+    <style>          
+        body { background: radial-gradient(circle, #1a2a3a, #000); color: white; text-align: center; font-family: sans-serif; overflow: hidden; height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }          
+        #score-container { font-size: 3rem; color: #f1c40f; font-weight: bold; }          
+        #dog-character { width: 220px; cursor: pointer; transition: 0.1s; filter: drop-shadow(0 0 15px #f1c40f); }  
+        #dog-character:active { transform: scale(0.95); }  
+        .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; width: 80%; }  
+        /* TON Connect Button Style */  
+        #ton-connect-btn { margin: 0 auto; }  
+        .invite-btn { padding: 12px; background: #0088cc; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }  
+    </style>          
+</head>          
+<body>          
+    <div id="score-container">💰 <span id="balance">0</span></div>          
+      
+    <div>      
+        <img id="dog-character" src="dog.png" alt="Rich Dog">      
+    </div>      
+  
+    <div class="btn-container">  
+        <div id="ton-connect-btn"></div>  
+          
+        <button class="invite-btn" onclick="inviteFriends()">👥 ጓደኞችን ጋብዝ</button>  
+    </div>  
+  
+    <script>          
+        let balance = parseInt(localStorage.getItem('rich_balance')) || 0;  
+        document.getElementById('balance').innerText = balance.toLocaleString();  
+  
+        // 1. Initialize TON Connect UI  
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({  
+            manifestUrl: 'https://abduluazizhussein-ctrl.github.io/black-site/tonconnect-manifest.json',  
+            buttonRootId: 'ton-connect-btn'  
+        });  
+  
+        // 2. Handle Tap  
+        document.getElementById('dog-character').addEventListener('click', (e) => {  
+            balance += 1;  
+            document.getElementById('balance').innerText = balance.toLocaleString();  
+            localStorage.setItem('rich_balance', balance);  
+            if (window.Telegram?.WebApp?.HapticFeedback) window.Telegram.WebApp.HapticFeedback.impactOccurred('light');  
+        });  
+  
+        // 3. Invite Function  
+        function inviteFriends() {  
+            const url = "https://t.me/Aziz_afarbot/richdog";  
+            const text = "Rich Dog ተጫወትና ሳንቲም ሰብስብ! 💰";  
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');  
+        }  
+    </script>      
+</body>      
+</html>
