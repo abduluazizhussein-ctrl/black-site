@@ -1,0 +1,94 @@
+<!DOCTYPE html>  
+<html lang="am">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>የቃላት ጨዋታ - አብዱላዚዝ</title>  
+    <style>  
+        body { margin: 0; background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }  
+        .game-container { width: 90%; max-width: 450px; background: #1e293b; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #00ffcc; }  
+        .scrambled-word { font-size: 35px; letter-spacing: 8px; color: #f1c40f; margin: 20px 0; font-weight: bold; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; }  
+        input { width: 80%; padding: 12px; border-radius: 10px; border: none; font-size: 18px; text-align: center; margin-bottom: 15px; }  
+        .btn { background: #00ffcc; color: #0f172a; padding: 12px 30px; border-radius: 50px; border: none; font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s; }  
+        .btn:hover { background: #00ccaa; transform: scale(1.05); }  
+        .score { font-size: 18px; color: #cbd5e1; margin-top: 15px; }  
+        #msg { margin-top: 10px; font-weight: bold; min-height: 24px; }  
+    </style>  
+</head>  
+<body>  
+  
+<div class="game-container">  
+    <h2 style="color: #00ffcc;">የቃላት ጨዋታ 🧩</h2>  
+    <p>የተዘበራረቁትን ፊደላት አስተካክሉ!</p>  
+      
+    <div id="game-box">  
+        <div class="scrambled-word" id="scrambled">----</div>  
+        <p id="hint" style="color: #94a3b8; font-style: italic;"></p>  
+        <input type="text" id="user-input" placeholder="ትክክለኛውን ቃል እዚህ ይጻፉ..." autocomplete="off">  
+        <br>  
+        <button class="btn" onclick="checkWord()">እሺ 👍</button>  
+        <div id="msg"></div>  
+        <div class="score">ነጥብ: <span id="score-val">0</span>/5</div>  
+    </div>  
+  
+    <div id="win-box" style="display:none;">  
+        <h1 style="color: #f1c40f;">ድንቅ ነው! 🎉</h1>  
+        <p>ሁሉንም ቃላት በትክክል አግኝተዋል።</p>  
+        <button class="btn" onclick="location.reload()">እንደገና ተጫወት 🔄</button>  
+        <br><br>  
+        <a href="index.html" style="color: #00ffcc; text-decoration: none;">ወደ ዋናው ገጽ ተመለስ</a>  
+    </div>  
+</div>  
+  
+<script>  
+    const words = [  
+        { correct: "መሐመድ", scrambled: "መመሐድ", hint: "የአላህ መልእክተኛ (ሰ.ዐ.ወ)" },  
+        { correct: "ኢትዮጵያ", scrambled: "ትዮኢጵያ", hint: "ሀገራችን" },  
+        { correct: "ቁርኣን", scrambled: "አንቁር", hint: "የአላህ ቃል" },  
+        { correct: "ሶላት", scrambled: "ላትሶ", hint: "የእስልምና ምሰሶ" },  
+        { correct: "ረመዳን", scrambled: "መዳንረ", hint: "የጾም ወር" }  
+    ];  
+  
+    let current = 0;  
+    let score = 0;  
+  
+    function loadGame() {  
+        if(current < words.length) {  
+            document.getElementById("scrambled").innerText = words[current].scrambled;  
+            document.getElementById("hint").innerText = "ፍንጭ: " + words[current].hint;  
+            document.getElementById("user-input").value = "";  
+            document.getElementById("msg").innerText = "";  
+        } else {  
+            document.getElementById("game-box").style.display = "none";  
+            document.getElementById("win-box").style.display = "block";  
+            notifyTelegram();  
+        }  
+    }  
+  
+    function checkWord() {  
+        let val = document.getElementById("user-input").value.trim();  
+        if(val === words[current].correct) {  
+            score++;  
+            current++;  
+            document.getElementById("score-val").innerText = score;  
+            document.getElementById("msg").style.color = "#00ffcc";  
+            document.getElementById("msg").innerText = "ትክክል! ✅";  
+            setTimeout(loadGame, 1000);  
+        } else {  
+            document.getElementById("msg").style.color = "#ff4d4d";  
+            document.getElementById("msg").innerText = "እንደገና ሞክር ❌";  
+        }  
+    }  
+  
+    function notifyTelegram() {  
+        const token = "8269565802:AAH80pcceZonFiX2B4gUiCC0mtb7osyZBqU";  
+        const chatId = "8105159131";   
+        const text = `🎮 አብዱላዚዝ አዲስ የቃላት ጨዋታ አሸናፊ!\nተጠቃሚው ሁሉንም ቃላት አስተካክሏል።`;  
+        fetch(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}`);  
+    }  
+  
+    loadGame();  
+</script>  
+  
+</body>  
+</html>
