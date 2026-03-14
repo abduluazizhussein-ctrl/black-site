@@ -1,1 +1,152 @@
-
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+    <title>$AZIZ Coin Clicker</title>  
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>  
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>  
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>  
+    <style>  
+        body {  
+            margin: 0;  
+            padding: 0;  
+            background: radial-gradient(circle, #1e293b 0%, #020617 100%);  
+            color: white;  
+            font-family: 'Arial', sans-serif;  
+            display: flex;  
+            flex-direction: column;  
+            align-items: center;  
+            justify-content: center;  
+            height: 100vh;  
+            overflow: hidden;  
+            user-select: none;  
+        }  
+        #coin-name {  
+            font-size: 1.8rem;  
+            color: #fbbf24;  
+            margin-bottom: 5px;  
+            font-weight: bold;  
+            letter-spacing: 3px;  
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);  
+        }  
+        #score-container {  
+            font-size: 4rem;  
+            font-weight: 900;  
+            margin-bottom: 30px;  
+            color: white;  
+        }  
+        #coin-container {  
+            position: relative;  
+            cursor: pointer;  
+            transition: transform 0.1s;  
+        }  
+        #coin-container:active {  
+            transform: scale(0.90);  
+        }  
+        #coin-image {  
+            width: 280px;  
+            height: 280px;  
+            border-radius: 50%;  
+            box-shadow: 0 0 60px rgba(251, 191, 36, 0.4);  
+            border: 4px solid #fbbf24;  
+        }  
+        .click-animation {  
+            position: absolute;  
+            color: #fbbf24;  
+            font-weight: bold;  
+            font-size: 2.5rem;  
+            animation: floatUp 0.6s ease-out forwards;  
+            pointer-events: none;  
+        }  
+        @keyframes floatUp {  
+            0% { opacity: 1; transform: translateY(0); }  
+            100% { opacity: 0; transform: translateY(-150px); }  
+        }  
+        #status {  
+            margin-top: 40px;  
+            font-size: 1rem;  
+            color: #94a3b8;  
+            background: rgba(255,255,255,0.1);  
+            padding: 8px 20px;  
+            border-radius: 20px;  
+        }  
+    </style>  
+</head>  
+<body>  
+  
+    <div id="coin-name">$AZIZ COIN</div>  
+    <div id="score-container">0</div>  
+      
+    <div id="coin-container">  
+        <img id="coin-image" src="https://i.ibb.co/L6M7m9v/gold-coin.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2422/2422796.png'" alt="Coin">  
+    </div>  
+  
+    <div id="status">Connecting Wallet...</div>  
+  
+    <script>  
+        // Firebase Configuration (ከ Image 12 ላይ የወሰድነው)  
+        const firebaseConfig = {  
+            apiKey: "AIzaSyCPSJoIUF_xfrRqjiLQmEn_j2M",  
+            authDomain: "rich-dog-game.firebaseapp.com",  
+            projectId: "rich-dog-game",  
+            storageBucket: "rich-dog-game.firebasestorage.app",  
+            messagingSenderId: "899688128690",  
+            appId: "1:899688128690:web:2ad8761e98d7ba226a9ab",  
+            measurementId: "G-Z3MPB8SR6W"  
+        };  
+  
+        // Initialize Firebase  
+        firebase.initializeApp(firebaseConfig);  
+        const db = firebase.firestore();  
+  
+        // Telegram WebApp Setup  
+        const tg = window.Telegram.WebApp;  
+        tg.expand();  
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id.toString() : "guest_user";  
+  
+        let score = 0;  
+        const scoreElement = document.getElementById('score-container');  
+        const coinContainer = document.getElementById('coin-container');  
+        const statusElement = document.getElementById('status');  
+  
+        // Load Score from Database  
+        const userRef = db.collection('users').doc(userId);  
+        userRef.get().then((doc) => {  
+            if (doc.exists) {  
+                score = doc.data().score || 0;  
+                scoreElement.innerText = score.toLocaleString();  
+            }  
+            statusElement.innerText = "Owner: " + (tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Aziz");  
+        });  
+  
+        // Click Logic  
+        coinContainer.addEventListener('click', (e) => {  
+            score += 1;  
+            scoreElement.innerText = score.toLocaleString();  
+  
+            // Save to Firebase  
+            userRef.set({ score: score }, { merge: true });  
+  
+            // Animation  
+            const rect = coinContainer.getBoundingClientRect();  
+            const x = e.clientX - rect.left;  
+            const y = e.clientY - rect.top;  
+              
+            const anim = document.createElement('div');  
+            anim.className = 'click-animation';  
+            anim.innerText = '+1';  
+            anim.style.left = x + 'px';  
+            anim.style.top = y + 'px';  
+            coinContainer.appendChild(anim);  
+              
+            setTimeout(() => anim.remove(), 600);  
+              
+            // Haptic Feedback (vibration)  
+            if (tg.HapticFeedback) {  
+                tg.HapticFeedback.impactOccurred('medium');  
+            }  
+        });  
+    </script>  
+</body>  
+</html>
